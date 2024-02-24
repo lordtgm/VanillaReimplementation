@@ -6,7 +6,9 @@ import net.minestom.vanilla.datapack.worldgen.noise.Noise;
 import net.minestom.vanilla.files.FileSystem;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;

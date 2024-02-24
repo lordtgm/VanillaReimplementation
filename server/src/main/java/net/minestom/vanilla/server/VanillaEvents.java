@@ -23,7 +23,6 @@ import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.network.ConnectionManager;
 import net.minestom.server.network.packet.client.ClientPacket;
-import net.minestom.server.network.packet.client.common.ClientKeepAlivePacket;
 import net.minestom.server.network.packet.client.play.ClientPlayerPositionAndRotationPacket;
 import net.minestom.server.network.packet.client.play.ClientPlayerPositionPacket;
 import net.minestom.server.network.packet.client.play.ClientPlayerRotationPacket;
@@ -49,7 +48,6 @@ public class VanillaEvents {
                     .dropEverything(isTNT)
                     .build();
         };
-
         // TODO: World storage
 
         VanillaTestGenerator noiseTestGenerator = new VanillaTestGenerator();
@@ -103,7 +101,6 @@ public class VanillaEvents {
 
         eventNode.addListener(
                 EventListener.of(AsyncPlayerConfigurationEvent.class, event -> {
-
                     event.setSpawningInstance(overworld);
                     Logger.info(event.getPlayer().getUsername() + " joined the server");
                 })
@@ -119,11 +116,15 @@ public class VanillaEvents {
                     ClientPacket packet = event.getPacket();
                     // moving around and keepalive packets aren't usually required
                     if (packet instanceof ClientPlayerPositionPacket) return;
-                    if (packet instanceof ClientKeepAlivePacket) return;
                     if (packet instanceof ClientPlayerPositionAndRotationPacket) return;
-                    if (packet instanceof ClientPlayerRotationPacket) {
-                    }
-//                    Logger.info("Packet received " + event.getPacket());
+                    if (packet instanceof ClientPlayerRotationPacket) return;
+                    Logger.debug("Packet received " + event.getPacket());
+                }
+        );
+        eventNode.addListener(
+                PlayerPacketOutEvent.class,
+                playerPacketOutEvent -> {
+                    Logger.debug("Packet sent " + playerPacketOutEvent.getPacket());
                 }
         );
 
