@@ -1,13 +1,13 @@
 package net.minestom.vanilla.crafting;
 
 import dev.goldenstack.window.InventoryView;
+import net.kyori.adventure.key.Key;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.inventory.InventoryPreClickEvent;
 import net.minestom.server.inventory.Inventory;
 import net.minestom.server.inventory.InventoryType;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
-import net.minestom.server.item.StackingRule;
 import net.minestom.server.utils.NamespaceID;
 import net.minestom.vanilla.datapack.Datapack;
 import net.minestom.vanilla.datapack.DatapackUtils;
@@ -141,9 +141,9 @@ public record CraftingUtils(Datapack datapack) {
 
     public @NotNull Set<Material> ingredientToMaterials(Recipe.Ingredient ingredient) {
         if (ingredient instanceof Recipe.Ingredient.Tag tag) {
-            return DatapackUtils.findTags(datapack, "items", tag.tag())
+            return DatapackUtils.findTags(datapack, "item", tag.tag())
                     .stream()
-                    .map(NamespaceID::value)
+                    .map(NamespaceID::from)
                     .map(Material::fromNamespaceId)
                     .filter(Objects::nonNull)
                     .collect(Collectors.toUnmodifiableSet());
@@ -214,8 +214,8 @@ public record CraftingUtils(Datapack datapack) {
             // If the cursor is not empty:
 
             // if the cursor and output slot are compatible, merge the items
-            StackingRule stackingRule = StackingRule.get();
-            if (stackingRule.canBeStacked(cursor, output)) {
+            if (cursor.material() == output.material()) {
+                // TODO: Handle overflow
                 ItemStack newCursor = cursor.withAmount(amount -> amount + output.amount());
 
                 // I know these look swapped around, but it's correct

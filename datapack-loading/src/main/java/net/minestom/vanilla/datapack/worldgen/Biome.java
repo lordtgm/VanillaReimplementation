@@ -1,13 +1,14 @@
 package net.minestom.vanilla.datapack.worldgen;
 
 import com.squareup.moshi.JsonReader;
-import net.minestom.server.utils.NamespaceID;
+import net.kyori.adventure.nbt.BinaryTag;
+import net.kyori.adventure.nbt.CompoundBinaryTag;
+import net.kyori.adventure.key.Key;
 import net.minestom.vanilla.datapack.Datapack;
 import net.minestom.vanilla.datapack.DatapackLoader;
 import net.minestom.vanilla.datapack.json.JsonUtils;
 import net.minestom.vanilla.datapack.json.Optional;
 import org.jetbrains.annotations.Nullable;
-import org.jglrxavpok.hephaistos.nbt.NBTCompound;
 
 import java.io.IOException;
 import java.util.List;
@@ -39,7 +40,7 @@ public record Biome(
         Object features,
         @Optional Float creature_spawn_probability,
         Map<MobCategory, List<SpawnerData>> spawners,
-        Map<NamespaceID, SpawnCost> spawn_costs
+        Map<Key, SpawnCost> spawn_costs
 ) {
 
     /**
@@ -54,7 +55,7 @@ public record Biome(
      * Represents a sound in the game world.
      */
     public interface Sound {
-        NamespaceID type();
+        Key type();
 
         /**
          * Reads a Sound from JSON.
@@ -65,7 +66,7 @@ public record Biome(
          */
         static Sound fromJson(JsonReader reader) throws IOException {
             return JsonUtils.<Sound>typeMap(reader, token -> switch (token) {
-                case STRING -> json -> new SoundID(NamespaceID.from(json.nextString()));
+                case STRING -> json -> new SoundID(Key.key(json.nextString()));
                 case BEGIN_OBJECT -> json -> JsonUtils.unionStringTypeAdapted(json, "type", type -> switch (type) {
                     case "sound_id" -> SoundID.class;
                     case "range" -> Range.class;
@@ -78,10 +79,10 @@ public record Biome(
         /**
          * Represents a sound with a namespace ID.
          */
-        record SoundID(NamespaceID value) implements Sound {
+        record SoundID(Key value) implements Sound {
             @Override
-            public NamespaceID type() {
-                return NamespaceID.from("sound_id");
+            public Key type() {
+                return Key.key("sound_id");
             }
         }
 
@@ -90,8 +91,8 @@ public record Biome(
          */
         record Range(@Optional Float value) implements Sound {
             @Override
-            public NamespaceID type() {
-                return NamespaceID.from("range");
+            public Key type() {
+                return Key.key("range");
             }
         }
     }
@@ -128,7 +129,7 @@ public record Biome(
                  *
                  * @return The namespaced ID of the particle type.
                  */
-                NamespaceID type();
+                Key type();
 
                 /**
                  * Reads options from JSON.
@@ -157,8 +158,8 @@ public record Biome(
                  */
                 record Block(BlockState value) implements Options {
                     @Override
-                    public NamespaceID type() {
-                        return NamespaceID.from("block");
+                    public Key type() {
+                        return Key.key("block");
                     }
                 }
 
@@ -167,8 +168,8 @@ public record Biome(
                  */
                 record BlockMarker(BlockState value) implements Options {
                     @Override
-                    public NamespaceID type() {
-                        return NamespaceID.from("block_marker");
+                    public Key type() {
+                        return Key.key("block_marker");
                     }
                 }
 
@@ -177,8 +178,8 @@ public record Biome(
                  */
                 record FallingDust(BlockState value) implements Options {
                     @Override
-                    public NamespaceID type() {
-                        return NamespaceID.from("falling_dust");
+                    public Key type() {
+                        return Key.key("falling_dust");
                     }
                 }
 
@@ -190,13 +191,13 @@ public record Biome(
                     /**
                      * Represents the value of an item particle.
                      */
-                    record Value(NamespaceID id, int count, NBTCompound tag) {
+                    record Value(Key id, int count, CompoundBinaryTag tag) {
 
                     }
 
                     @Override
-                    public NamespaceID type() {
-                        return NamespaceID.from("item");
+                    public Key type() {
+                        return Key.key("item");
                     }
                 }
 
@@ -205,8 +206,8 @@ public record Biome(
                  */
                 record Dust(List<Float> color, float scale) implements Options {
                     @Override
-                    public NamespaceID type() {
-                        return NamespaceID.from("dust");
+                    public Key type() {
+                        return Key.key("dust");
                     }
                 }
 
@@ -215,8 +216,8 @@ public record Biome(
                  */
                 record DustColorTransition(List<Float> fromColor, List<Float> toColor, float scale) implements Options {
                     @Override
-                    public NamespaceID type() {
-                        return NamespaceID.from("dust_color_transition");
+                    public Key type() {
+                        return Key.key("dust_color_transition");
                     }
                 }
 
@@ -225,8 +226,8 @@ public record Biome(
                  */
                 record SculkCharge(float roll) implements Options {
                     @Override
-                    public NamespaceID type() {
-                        return NamespaceID.from("sculk_charge");
+                    public Key type() {
+                        return Key.key("sculk_charge");
                     }
                 }
 
@@ -235,15 +236,15 @@ public record Biome(
                  */
                 record Vibration(PositionSource destination, int arrival_in_ticks) implements Options {
                     @Override
-                    public NamespaceID type() {
-                        return NamespaceID.from("vibration");
+                    public Key type() {
+                        return Key.key("vibration");
                     }
 
                     /**
                      * Represents a position source for the vibration particle.
                      */
                     interface PositionSource {
-                        NamespaceID type();
+                        Key type();
 
                         /**
                          * Reads a PositionSource from JSON.
@@ -265,8 +266,8 @@ public record Biome(
                          */
                         record Block(int x, int y, int z) implements PositionSource {
                             @Override
-                            public NamespaceID type() {
-                                return NamespaceID.from("block");
+                            public Key type() {
+                                return Key.key("block");
                             }
                         }
 
@@ -275,8 +276,8 @@ public record Biome(
                          */
                         record Entity(UUID source_entity, @Optional Float y_offset) implements PositionSource {
                             @Override
-                            public NamespaceID type() {
-                                return NamespaceID.from("entity");
+                            public Key type() {
+                                return Key.key("entity");
                             }
                         }
                     }
@@ -287,15 +288,15 @@ public record Biome(
                  */
                 record Shriek(int delay) implements Options {
                     @Override
-                    public NamespaceID type() {
-                        return NamespaceID.from("shriek");
+                    public Key type() {
+                        return Key.key("shriek");
                     }
                 }
 
                 /**
                  * Represents generic particle options.
                  */
-                record Generic(NamespaceID type) implements Options {
+                record Generic(Key type) implements Options {
                 }
             }
         }
@@ -329,7 +330,7 @@ public record Biome(
 
         static CarversList fromJson(JsonReader reader) throws IOException {
             return JsonUtils.<CarversList>typeMap(reader, token -> switch (token) {
-                case STRING -> json -> new Single.Reference(NamespaceID.from(json.nextString()));
+                case STRING -> json -> new Single.Reference(Key.key(json.nextString()));
                 case BEGIN_OBJECT, BEGIN_ARRAY -> json -> {
                     var singleOrList = JsonUtils.SingleOrList.<CarversList.Single>fromJson(CarversList.Single.class, json);
                     if (!singleOrList.isList()) {
@@ -350,17 +351,17 @@ public record Biome(
 
             static Single fromJson(JsonReader reader) throws IOException {
                 return JsonUtils.<Single>typeMap(reader, token -> switch (token) {
-                    case STRING -> json -> new Reference(NamespaceID.from(json.nextString()));
+                    case STRING -> json -> new Reference(Key.key(json.nextString()));
                     case BEGIN_OBJECT -> json -> new Inlined(DatapackLoader.moshi(Carver.class).apply(json));
                     default -> null;
                 });
             }
 
             final class Reference implements Single {
-                private final NamespaceID id;
+                private final Key id;
                 private @Nullable Carver carver = null;
 
-                public Reference(NamespaceID id) {
+                public Reference(Key id) {
                     this.id = id;
                     DatapackLoader.loading().whenFinished(finisher -> {
                         for (var entry : finisher.datapack().namespacedData().entrySet()) {
@@ -370,7 +371,7 @@ public record Biome(
                             for (String file : carvers.files()) {
                                 var carver = carvers.file(file);
 
-                                NamespaceID carverId = NamespaceID.from(namespace, file.substring(0, file.length() - ".json".length()));
+                                Key carverId = Key.key(namespace, file.substring(0, file.length() - ".json".length()));
                                 if (carverId.equals(id)) {
                                     Reference.this.carver = carver;
                                     return;
@@ -391,7 +392,7 @@ public record Biome(
                     return carver;
                 }
 
-                public NamespaceID id() {
+                public Key id() {
                     return id;
                 }
 
@@ -434,7 +435,7 @@ public record Biome(
      * @param minCount The minimum count of mobs to spawn in a pack. Must be greater than 0.
      * @param maxCount The maximum count of mobs to spawn in a pack. Must be greater than 0. And must be not less than  minCount.
      */
-    public record SpawnerData(NamespaceID type, int weight, int minCount, int maxCount) {
+    public record SpawnerData(Key type, int weight, int minCount, int maxCount) {
     }
 
     public enum MobCategory {

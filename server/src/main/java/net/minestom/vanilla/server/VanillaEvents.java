@@ -53,7 +53,7 @@ public class VanillaEvents {
         VanillaTestGenerator noiseTestGenerator = new VanillaTestGenerator();
         Instance overworld = server.overworld();
 //        overworld.enableAutoChunkLoad(true);
-//        overworld.setGenerator(noiseTestGenerator);
+        overworld.setGenerator(noiseTestGenerator);
 //        overworld.setExplosionSupplier(explosionGenerator);
 //        overworld.setChunkLoader(new AnvilChunkLoader(storageManager.getLocation(worldName + "/region")));
 //
@@ -165,16 +165,6 @@ public class VanillaEvents {
                             Player player = event.getPlayer();
 
                             player.setPermissionLevel(4);
-                            player.setGameMode(GameMode.CREATIVE);
-
-                            player.getInstance().loadChunk(player.getPosition()).join();
-
-                            int y = player.getInstance().getDimensionType().getMaxY();
-                            while (player.getInstance().getBlock(1, y, 1).isAir()) {
-                                y--;
-                            }
-
-                            player.teleport(new Pos(1, y + 1, 1));
                             PlayerInventory inventory = player.getInventory();
 
                             inventory.addItemStack(ItemStack.of(Material.OBSIDIAN, 1));

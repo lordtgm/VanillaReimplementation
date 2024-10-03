@@ -15,7 +15,6 @@ build/*
 .mtj.tmp/
 
 # Package Files #
-*.jar
 *.war
 *.nar
 *.ear
@@ -38,3 +37,6 @@ out/
 # Vanilla-like server
 server.properties
 world/
+/datapack-tests/mojang-data
+/mojang-data/1.20.4
+/mojang-data/1.21.1
